@@ -109,207 +109,217 @@ let inventario = JSON.parse(localStorage.getItem("inventarioEco")) || [
   }
 ];
 
-// ---------- VARIABLES ----------
-
-const contenedor = document.getElementById("productos");
-const buscador = document.getElementById("buscador");
-const botonesFiltro = document.querySelectorAll(".btn-filtro");
-
-const totalProductos = document.getElementById("totalProductos");
-const valorInventario = document.getElementById("valorInventario");
-
-const detalle = document.getElementById("detalle");
-
+// Variables globales
 let categoriaActual = "todos";
+let carrito = JSON.parse(localStorage.getItem("carritoEco")) || [];
+let comprasHoy = parseInt(localStorage.getItem("comprasHoy")) || 0;
 
-// ---------- GUARDAR LOCAL ----------
+// Elementos del DOM
+const searchInput = document.getElementById("searchInput");
+const clearSearch = document.getElementById("clearSearch");
+const categoryFilters = document.getElementById("categoryFilters");
+const productGrid = document.getElementById("productGrid");
+const emptyState = document.getElementById("emptyState");
+const resultsCount = document.getElementById("resultsCount");
+const detailPanel = document.getElementById("detailPanel");
+const detailClose = document.getElementById("detailClose");
+const detailImg = document.getElementById("detailImg");
+const detailCat = document.getElementById("detailCat");
+const detailName = document.getElementById("detailName");
+const detailDesc = document.getElementById("detailDesc");
+const detailPrice = document.getElementById("detailPrice");
+const detailStockBadge = document.getElementById("detailStockBadge");
+const detailBuyBtn = document.getElementById("detailBuyBtn");
+const themeBtn = document.getElementById("themeBtn");
+const themeIcon = document.getElementById("themeIcon");
+const cartCount = document.getElementById("cartCount");
+const statTotal = document.getElementById("statTotal");
+const statInventoryValue = document.getElementById("statInventoryValue");
+const statInStock = document.getElementById("statInStock");
+const statPurchases = document.getElementById("statPurchases");
+const toast = document.getElementById("toast");
 
+// Funciones de utilidad
 function guardarLocal() {
   localStorage.setItem("inventarioEco", JSON.stringify(inventario));
+  localStorage.setItem("carritoEco", JSON.stringify(carrito));
+  localStorage.setItem("comprasHoy", comprasHoy);
 }
 
-// ---------- MOSTRAR PRODUCTOS ----------
+function mostrarToast(mensaje, tipo = "success") {
+  toast.textContent = mensaje;
+  toast.className = `toast ${tipo}`;
+  toast.style.display = "block";
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
 
-function mostrarProductos(lista) {
+function actualizarEstadisticas() {
+  const totalProductos = inventario.length;
+  const valorInventario = inventario.reduce((acc, p) => acc + (p.precio * p.stock), 0);
+  const enStock = inventario.filter(p => p.stock > 0).length;
 
-  contenedor.innerHTML = "";
+  statTotal.textContent = totalProductos;
+  statInventoryValue.textContent = `S/ ${valorInventario.toFixed(2)}`;
+  statInStock.textContent = enStock;
+  statPurchases.textContent = comprasHoy;
+}
 
-  lista.forEach(producto => {
+function actualizarCarrito() {
+  cartCount.textContent = carrito.length;
+}
 
+// Generar filtros de categoría dinámicamente
+function generarFiltrosCategoria() {
+  const categorias = ["todos", ...new Set(inventario.map(p => p.categoria))];
+  categoryFilters.innerHTML = "";
+
+  categorias.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = `category-btn ${cat === categoriaActual ? "active" : ""}`;
+    btn.textContent = cat === "todos" ? "Todos" : cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.dataset.categoria = cat;
+    btn.addEventListener("click", () => {
+      categoriaActual = cat;
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      aplicarFiltros();
+    });
+    categoryFilters.appendChild(btn);
+  });
+}
+
+// Mostrar productos
+function mostrarProductos(productos) {
+  productGrid.innerHTML = "";
+  emptyState.style.display = productos.length === 0 ? "block" : "none";
+  resultsCount.textContent = `${productos.length} producto${productos.length !== 1 ? "s" : ""} encontrado${productos.length !== 1 ? "s" : ""}`;
+
+  productos.forEach(producto => {
     const card = document.createElement("div");
-    card.classList.add("card");
-
-    // estado agotado
-    if (producto.stock === 0) {
-      card.classList.add("agotado");
-    }
+    card.className = "product-card";
+    if (producto.stock === 0) card.classList.add("out-of-stock");
 
     card.innerHTML = `
-      <img src="${producto.imagen}" alt="${producto.nombre}">
-
-      <h2>${producto.nombre}</h2>
-
-      <p class="precio">S/ ${producto.precio}</p>
-
-      <p class="stock">
-        Stock: ${producto.stock > 0 ? producto.stock : "Agotado"}
-      </p>
-
-      <button 
-        class="btn-comprar"
-        ${producto.stock === 0 ? "disabled" : ""}
-      >
-        ${producto.stock === 0 ? "Sin stock" : "Comprar"}
-      </button>
+      <div class="product-img">
+        <span>${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : "📦"}</span>
+      </div>
+      <div class="product-info">
+        <span class="product-cat">${producto.categoria}</span>
+        <h3 class="product-name">${producto.nombre}</h3>
+        <p class="product-price">S/ ${producto.precio.toFixed(2)}</p>
+        <div class="product-footer">
+          <span class="product-stock ${producto.stock > 0 ? "in-stock" : "out-of-stock"}">
+            ${producto.stock > 0 ? `Stock: ${producto.stock}` : "Agotado"}
+          </span>
+          <button class="buy-btn ${producto.stock === 0 ? "disabled" : ""}" data-id="${producto.id}">
+            ${producto.stock === 0 ? "Sin stock" : "Comprar"}
+          </button>
+        </div>
+      </div>
     `;
 
-    // -------- ANIMACIÓN SELECCIÓN --------
-
-    card.addEventListener("click", () => {
-
-      document.querySelectorAll(".card").forEach(c => {
-        c.classList.remove("seleccionado");
-      });
-
-      card.classList.add("seleccionado");
-
-      mostrarDetalle(producto);
-    });
-
-    // -------- COMPRA --------
-
-    const boton = card.querySelector(".btn-comprar");
-
-    boton.addEventListener("click", (e) => {
-
+    card.addEventListener("click", () => mostrarDetalle(producto));
+    card.querySelector(".buy-btn").addEventListener("click", (e) => {
       e.stopPropagation();
-
       comprarProducto(producto.id);
     });
 
-    contenedor.appendChild(card);
+    productGrid.appendChild(card);
   });
-
-  actualizarEstadisticas();
 }
 
-// ---------- DETALLE ----------
-
+// Mostrar detalle del producto
 function mostrarDetalle(producto) {
+  detailImg.innerHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : "📦";
+  detailCat.textContent = producto.categoria;
+  detailName.textContent = producto.nombre;
+  detailDesc.textContent = producto.descripcion;
+  detailPrice.textContent = `S/ ${producto.precio.toFixed(2)}`;
+  detailStockBadge.textContent = producto.stock > 0 ? `Stock: ${producto.stock}` : "Agotado";
+  detailStockBadge.className = `detail-stock-badge ${producto.stock > 0 ? "in-stock" : "out-of-stock"}`;
+  detailBuyBtn.disabled = producto.stock === 0;
+  detailBuyBtn.textContent = producto.stock === 0 ? "Sin stock" : "Comprar ahora";
+  detailBuyBtn.dataset.id = producto.id;
 
-  detalle.innerHTML = `
-    <div class="detalle-box fade">
-      <img src="${producto.imagen}" width="200">
-
-      <div>
-        <h2>${producto.nombre}</h2>
-
-        <p>${producto.descripcion}</p>
-
-        <p><strong>Categoría:</strong> ${producto.categoria}</p>
-
-        <p><strong>Precio:</strong> S/ ${producto.precio}</p>
-
-        <p><strong>Stock:</strong> ${producto.stock}</p>
-      </div>
-    </div>
-  `;
+  detailPanel.classList.add("open");
 }
 
-// ---------- COMPRAR ----------
+// Cerrar detalle
+function cerrarDetalle() {
+  detailPanel.classList.remove("open");
+}
 
+// Comprar producto
 function comprarProducto(id) {
-
   const producto = inventario.find(p => p.id === id);
-
-  // evitar negativos
-  if (producto.stock > 0) {
-
+  if (producto && producto.stock > 0) {
     producto.stock--;
-
+    carrito.push(producto);
+    comprasHoy++;
     guardarLocal();
-
+    actualizarEstadisticas();
+    actualizarCarrito();
     aplicarFiltros();
-
-    // animación compra
-    detalle.classList.add("shake");
-
-    setTimeout(() => {
-      detalle.classList.remove("shake");
-    }, 500);
+    mostrarToast(`¡${producto.nombre} agregado al carrito!`);
+    if (detailPanel.classList.contains("open")) {
+      cerrarDetalle();
+    }
   }
 }
 
-// ---------- FILTROS ----------
-
+// Aplicar filtros
 function aplicarFiltros() {
-
-  const texto = buscador.value.toLowerCase();
-
-  let filtrados = inventario.filter(producto => {
-
-    const coincideCategoria =
-      categoriaActual === "todos" ||
-      producto.categoria === categoriaActual;
-
-    const coincideTexto =
-      producto.nombre.toLowerCase().includes(texto);
-
-    return coincideCategoria && coincideTexto;
+  const query = searchInput.value.toLowerCase();
+  let filtrados = inventario.filter(p => {
+    const coincideCategoria = categoriaActual === "todos" || p.categoria === categoriaActual;
+    const coincideBusqueda = p.nombre.toLowerCase().includes(query) || p.descripcion.toLowerCase().includes(query);
+    return coincideCategoria && coincideBusqueda;
   });
-
   mostrarProductos(filtrados);
 }
 
-// ---------- BOTONES FILTRO ----------
-
-botonesFiltro.forEach(btn => {
-
-  btn.addEventListener("click", () => {
-
-    botonesFiltro.forEach(b => {
-      b.classList.remove("activo");
-    });
-
-    btn.classList.add("activo");
-
-    categoriaActual = btn.dataset.categoria;
-
-    aplicarFiltros();
-  });
-});
-
-// ---------- BUSCADOR EN VIVO ----------
-
-buscador.addEventListener("input", aplicarFiltros);
-
-// ---------- ESTADÍSTICAS ----------
-
-function actualizarEstadisticas() {
-
-  totalProductos.textContent = inventario.length;
-
-  const total = inventario.reduce((acc, producto) => {
-    return acc + (producto.precio * producto.stock);
-  }, 0);
-
-  valorInventario.textContent = `S/ ${total.toFixed(2)}`;
+// Toggle tema
+function toggleTema() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+  themeIcon.textContent = isDark ? "🌙" : "☀️";
+  localStorage.setItem("temaEco", isDark ? "light" : "dark");
 }
 
-// ---------- MODO OSCURO ----------
+// Inicialización
+function init() {
+  // Cargar tema
+  const temaGuardado = localStorage.getItem("temaEco") || "light";
+  document.documentElement.setAttribute("data-theme", temaGuardado);
+  themeIcon.textContent = temaGuardado === "dark" ? "☀️" : "🌙";
 
-const btnModo = document.getElementById("modoOscuro");
+  // Generar filtros
+  generarFiltrosCategoria();
 
-btnModo.addEventListener("click", () => {
+  // Mostrar productos iniciales
+  aplicarFiltros();
 
-  document.body.classList.toggle("dark");
+  // Actualizar estadísticas y carrito
+  actualizarEstadisticas();
+  actualizarCarrito();
 
-  btnModo.textContent =
-    document.body.classList.contains("dark")
-      ? "☀️ Modo Claro"
-      : "🌙 Modo Oscuro";
-});
+  // Event listeners
+  searchInput.addEventListener("input", aplicarFiltros);
+  clearSearch.addEventListener("click", () => {
+    searchInput.value = "";
+    aplicarFiltros();
+  });
+  detailClose.addEventListener("click", cerrarDetalle);
+  detailBuyBtn.addEventListener("click", (e) => comprarProducto(e.target.dataset.id));
+  themeBtn.addEventListener("click", toggleTema);
 
-// ---------- INICIO ----------
+  // Cerrar detalle al hacer clic fuera
+  detailPanel.addEventListener("click", (e) => {
+    if (e.target === detailPanel) cerrarDetalle();
+  });
+}
 
-mostrarProductos(inventario);
+// Iniciar aplicación
+init();
