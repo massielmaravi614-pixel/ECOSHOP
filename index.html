@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoShop — Catálogo</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232d6a4f'/><text x='16' y='22' font-size='18' text-anchor='middle' fill='white'>🌿</text></svg>">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-leaf">🌿</span>
+        Eco<em>Shop</em>
+      </div>
+      <div class="header-right">
+        <button class="theme-btn" id="themeBtn" title="Cambiar tema">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <div class="cart-btn" id="cartIndicator">
+          <span>🛒</span>
+          <span class="cart-count" id="cartCount">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- PANEL DE ESTADÍSTICAS -->
+    <section class="stats-section">
+      <div class="stat-item">
+        <span class="stat-num" id="statTotal">0</span>
+        <span class="stat-label">Productos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" id="statInventoryValue">S/ 0</span>
+        <span class="stat-label">Valor del inventario</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" id="statInStock">0</span>
+        <span class="stat-label">En stock</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" id="statPurchases">0</span>
+        <span class="stat-label">Compras hoy</span>
+      </div>
+    </section>
+
+    <!-- CONTROLES -->
+    <section class="controls-section">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos..." />
+        <button class="clear-btn" id="clearSearch" title="Limpiar">✕</button>
+      </div>
+
+      <div class="category-filters" id="categoryFilters">
+        <!-- Se generan dinámicamente desde JS -->
+      </div>
+    </section>
+
+    <!-- PANEL DE DETALLE (oculto por defecto) -->
+    <aside class="detail-panel" id="detailPanel">
+      <button class="detail-close" id="detailClose">✕</button>
+      <div class="detail-img-wrap">
+        <span class="detail-img" id="detailImg"></span>
+      </div>
+      <div class="detail-body">
+        <span class="detail-cat" id="detailCat"></span>
+        <h2 class="detail-name" id="detailName"></h2>
+        <p class="detail-desc" id="detailDesc"></p>
+        <div class="detail-row">
+          <span class="detail-price" id="detailPrice"></span>
+          <span class="detail-stock-badge" id="detailStockBadge"></span>
+        </div>
+        <button class="buy-btn-large" id="detailBuyBtn">Comprar ahora</button>
+      </div>
+    </aside>
+
+    <!-- RESULTADOS -->
+    <div class="results-bar">
+      <span id="resultsCount"></span>
+    </div>
+
+    <!-- GRILLA DE PRODUCTOS -->
+    <section class="product-grid" id="productGrid">
+      <!-- Tarjetas generadas por JS -->
+    </section>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🌱</div>
+      <p>No encontramos productos con esos criterios.</p>
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
