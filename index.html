@@ -3,85 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoShop - Catálogo Interactivo</title>
+    <title>EcoShop | Catálogo Inteligente</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <!-- Fuente moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <!-- ENCABEZADO -->
-    <header>
-        <h1>EcoShop 🌱</h1>
-        <p>Dashboard de Gestión de Productos</p>
-    </header>
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+    <div class="brand">
+        <span class="logo">🌿</span>
+        <div>
+            <h1>EcoShop</h1>
+            <small>Catálogo Inteligente de Productos</small>
+        </div>
+    </div>
 
-    <!-- PANEL DE ESTADÍSTICAS -->
-    <section id="estadisticas">
-        <h2>Estadísticas del Inventario</h2>
-        <p>Total de productos: <span id="total-productos">0</span></p>
-        <p>Valor total del inventario: <span id="valor-inventario">0</span></p>
-    </section>
+    <div class="stats-mini">
+        <div>
+            <span id="total-productos">0</span>
+            <small>Productos</small>
+        </div>
+        <div>
+            <span id="valor-inventario">0</span>
+            <small>Inventario</small>
+        </div>
+    </div>
+</header>
 
-    <!-- BÚSQUEDA -->
-    <section id="buscador">
-        <h2>Buscar productos</h2>
+<!-- ================= CONTROLES ================= -->
+<section class="controls">
+
+    <!-- BUSCADOR -->
+    <div class="search-box">
         <input 
             type="text" 
             id="input-busqueda" 
-            placeholder="Buscar productos por nombre..."
+            placeholder="🔎 Buscar productos..."
         >
-    </section>
+    </div>
 
     <!-- FILTROS -->
-    <section id="filtros">
-        <h2>Categorías</h2>
-        <button data-categoria="todos">Todos</button>
+    <div class="filters" id="filtros">
+        <button data-categoria="todos" class="active">Todos</button>
         <button data-categoria="hogar">Hogar</button>
         <button data-categoria="tecnología">Tecnología</button>
         <button data-categoria="deportes">Deportes</button>
+    </div>
+
+</section>
+
+<!-- ================= MAIN ================= -->
+<main class="layout">
+
+    <!-- PRODUCTOS -->
+    <section class="products-section">
+
+        <h2>Productos disponibles</h2>
+
+        <div id="grid-productos" class="grid">
+            <!-- JS RENDER AQUÍ -->
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="emptyState" class="empty-state">
+            🌱 No se encontraron productos
+        </div>
+
     </section>
 
-    <!-- CONTENEDOR DE PRODUCTOS -->
-    <main>
-        <h2>Productos</h2>
+    <!-- DETALLE -->
+    <aside id="detalle-producto" class="detail-panel">
 
-        <section id="grid-productos">
-            <!-- Aquí se renderizan las tarjetas de productos dinámicamente -->
+        <h2>Detalle del producto</h2>
 
-            <!-- EJEMPLO DE CARD (referencial, se generará con JS) -->
-            <article class="card-producto" data-id="0">
-                <img src="" alt="Imagen del producto">
-                
-                <div class="info-producto">
-                    <h3 class="nombre-producto">Nombre</h3>
-                    <p class="categoria-producto">Categoría</p>
-                    <p class="precio-producto">Precio</p>
-                    <p class="stock-producto">Stock: 0</p>
-                </div>
-
-                <div class="acciones-producto">
-                    <button class="btn-comprar">Comprar</button>
-                </div>
-            </article>
-
-        </section>
-    </main>
-
-    <!-- PANEL DE INFORMACIÓN DETALLADA -->
-    <aside id="detalle-producto">
-        <h2>Detalle del Producto</h2>
-        <p>Selecciona un producto para ver más información</p>
-        
-        <div id="contenido-detalle">
-            <!-- Se actualiza dinámicamente al seleccionar un producto -->
+        <div id="contenido-detalle" class="detail-content">
+            <p>Selecciona un producto para ver detalles</p>
         </div>
-    </aside>
-    <script src="script.js"></script>    
 
-    <!-- FOOTER -->
-    <footer>
-        <p>EcoShop © 2026 - Proyecto Educativo</p>
-    </footer>
+    </aside>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <p>EcoShop © 2026 — Sistema de Gestión de Inventario</p>
+</footer>
+
+<!-- ================= SCRIPT ================= -->
+<script src="script.js"></script>
 
 </body>
 </html>
