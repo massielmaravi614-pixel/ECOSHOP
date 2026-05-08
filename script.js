@@ -1,281 +1,190 @@
-// =========================
-// 🌿 ECO SHOP - INVENTARIO
-// =========================
-
 let inventario = JSON.parse(localStorage.getItem("inventarioEco")) || [
-  {
-    id: 1,
-    nombre: "Botella Ecológica",
-    precio: 25.5,
-    categoria: "hogar",
-    stock: 10,
-    imagen: "https://picsum.photos/300?1",
-    descripcion: "Botella reutilizable de acero inoxidable."
-  },
-  {
-    id: 2,
-    nombre: "Audífonos Bluetooth",
-    precio: 120,
-    categoria: "tecnologia",
-    stock: 8,
-    imagen: "https://picsum.photos/300?2",
-    descripcion: "Audífonos inalámbricos con cancelación de ruido."
-  },
-  {
-    id: 3,
-    nombre: "Pelota Profesional",
-    precio: 80,
-    categoria: "deportes",
-    stock: 6,
-    imagen: "https://picsum.photos/300?3",
-    descripcion: "Pelota oficial para entrenamiento."
-  },
-  {
-    id: 4,
-    nombre: "Laptop Gamer",
-    precio: 3500,
-    categoria: "tecnologia",
-    stock: 3,
-    imagen: "https://picsum.photos/300?4",
-    descripcion: "Laptop de alto rendimiento."
-  },
-  {
-    id: 5,
-    nombre: "Silla Ergonómica",
-    precio: 450,
-    categoria: "hogar",
-    stock: 5,
-    imagen: "https://picsum.photos/300?5",
-    descripcion: "Silla cómoda para oficina."
-  },
-  {
-    id: 6,
-    nombre: "Mancuernas",
-    precio: 95,
-    categoria: "deportes",
-    stock: 7,
-    imagen: "https://picsum.photos/300?6",
-    descripcion: "Set de mancuernas ajustables."
-  },
-  {
-    id: 7,
-    nombre: "Smartwatch",
-    precio: 320,
-    categoria: "tecnologia",
-    stock: 4,
-    imagen: "https://picsum.photos/300?7",
-    descripcion: "Reloj inteligente resistente al agua."
-  },
-  {
-    id: 8,
-    nombre: "Lámpara LED",
-    precio: 60,
-    categoria: "hogar",
-    stock: 12,
-    imagen: "https://picsum.photos/300?8",
-    descripcion: "Lámpara moderna de bajo consumo."
-  },
-  {
-    id: 9,
-    nombre: "Yoga Mat",
-    precio: 70,
-    categoria: "deportes",
-    stock: 9,
-    imagen: "https://picsum.photos/300?9",
-    descripcion: "Colchoneta antideslizante."
-  },
-  {
-    id: 10,
-    nombre: "Teclado Mecánico",
-    precio: 180,
-    categoria: "tecnologia",
-    stock: 5,
-    imagen: "https://picsum.photos/300?10",
-    descripcion: "Teclado RGB para gaming."
-  },
-  {
-    id: 11,
-    nombre: "Organizador",
-    precio: 40,
-    categoria: "hogar",
-    stock: 11,
-    imagen: "https://picsum.photos/300?11",
-    descripcion: "Caja organizadora multiusos."
-  },
-  {
-    id: 12,
-    nombre: "Bicicleta MTB",
-    precio: 1200,
-    categoria: "deportes",
-    stock: 2,
-    imagen: "https://picsum.photos/300?12",
-    descripcion: "Bicicleta de montaña profesional."
-  }
+  { id: 1, nombre: "Botella Ecológica", precio: 25.5, categoria: "hogar", stock: 10, imagen: "https://picsum.photos/300?1", descripcion: "Botella reutilizable de acero inoxidable." },
+  { id: 2, nombre: "Audífonos Bluetooth", precio: 120, categoria: "tecnologia", stock: 8, imagen: "https://picsum.photos/300?2", descripcion: "Audífonos inalámbricos con cancelación de ruido." },
+  { id: 3, nombre: "Pelota Profesional", precio: 80, categoria: "deportes", stock: 6, imagen: "https://picsum.photos/300?3", descripcion: "Pelota oficial para entrenamiento." },
+  { id: 4, nombre: "Laptop Gamer", precio: 3500, categoria: "tecnologia", stock: 3, imagen: "https://picsum.photos/300?4", descripcion: "Laptop de alto rendimiento para gaming." },
+  { id: 5, nombre: "Silla Ergonómica", precio: 450, categoria: "hogar", stock: 5, imagen: "https://picsum.photos/300?5", descripcion: "Silla cómoda para oficina." },
+  { id: 6, nombre: "Mancuernas", precio: 95, categoria: "deportes", stock: 7, imagen: "https://picsum.photos/300?6", descripcion: "Set de mancuernas ajustables." },
+  { id: 7, nombre: "Smartwatch", precio: 320, categoria: "tecnologia", stock: 4, imagen: "https://picsum.photos/300?7", descripcion: "Reloj inteligente resistente al agua." },
+  { id: 8, nombre: "Lámpara LED", precio: 60, categoria: "hogar", stock: 12, imagen: "https://picsum.photos/300?8", descripcion: "Lámpara moderna de bajo consumo." },
+  { id: 9, nombre: "Yoga Mat", precio: 70, categoria: "deportes", stock: 9, imagen: "https://picsum.photos/300?9", descripcion: "Colchoneta antideslizante para yoga." },
+  { id: 10, nombre: "Teclado Mecánico", precio: 180, categoria: "tecnologia", stock: 5, imagen: "https://picsum.photos/300?10", descripcion: "Teclado RGB para gaming." },
+  { id: 11, nombre: "Organizador", precio: 40, categoria: "hogar", stock: 11, imagen: "https://picsum.photos/300?11", descripcion: "Caja organizadora multiusos." },
+  { id: 12, nombre: "Bicicleta MTB", precio: 1200, categoria: "deportes", stock: 2, imagen: "https://picsum.photos/300?12", descripcion: "Bicicleta de montaña profesional." }
 ];
 
-// =========================
-// 🎯 ELEMENTOS DEL DOM (CORREGIDOS)
-// =========================
-
-const contenedor = document.getElementById("productGrid");
-const buscador = document.getElementById("searchInput");
-const botonesFiltro = document.querySelectorAll(".btn-filtro");
-
-const totalProductos = document.getElementById("statTotal");
-const valorInventario = document.getElementById("statInventoryValue");
-const stockTotal = document.getElementById("statInStock");
-
-const detallePanel = document.getElementById("detailPanel");
-const detailName = document.getElementById("detailName");
-const detailCat = document.getElementById("detailCat");
-const detailPrice = document.getElementById("detailPrice");
-const detailDesc = document.getElementById("detailDesc");
-const detailStock = document.getElementById("detailStockBadge");
-const detailImg = document.getElementById("detailImg");
-const detailClose = document.getElementById("detailClose");
-
+// ================= DOM =================
+const grid = document.getElementById("productGrid");
+const searchInput = document.getElementById("searchInput");
+const categoryFilters = document.getElementById("categoryFilters");
 const emptyState = document.getElementById("emptyState");
+const resultsCount = document.getElementById("resultsCount");
+
+// STATS
+const statTotal = document.getElementById("statTotal");
+const statInventoryValue = document.getElementById("statInventoryValue");
+const statInStock = document.getElementById("statInStock");
+const statPurchases = document.getElementById("statPurchases");
+
+// DETAIL PANEL
+const detailPanel = document.getElementById("detailPanel");
+const detailClose = document.getElementById("detailClose");
+const detailImg = document.getElementById("detailImg");
+const detailCat = document.getElementById("detailCat");
+const detailName = document.getElementById("detailName");
+const detailDesc = document.getElementById("detailDesc");
+const detailPrice = document.getElementById("detailPrice");
+const detailStockBadge = document.getElementById("detailStockBadge");
+const detailBuyBtn = document.getElementById("detailBuyBtn");
 
 let categoriaActual = "todos";
+let comprasHoy = 0;
 
-// =========================
-// 💾 LOCALSTORAGE
-// =========================
-
+// ================= GUARDAR =================
 function guardar() {
   localStorage.setItem("inventarioEco", JSON.stringify(inventario));
 }
 
-// =========================
-// 🧱 RENDER PRODUCTOS
-// =========================
+// ================= RENDER =================
+function render(lista) {
+  grid.innerHTML = "";
 
-function render() {
-  contenedor.innerHTML = "";
+  if (lista.length === 0) {
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
+  }
 
-  const texto = buscador.value.toLowerCase();
+  resultsCount.textContent = `${lista.length} productos encontrados`;
 
-  let filtrados = inventario.filter(p => {
+  lista.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    if (p.stock === 0) card.classList.add("sold-out");
+
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${p.imagen}" width="100%" height="150" style="object-fit:cover;">
+      </div>
+
+      <div class="card-body">
+        <span class="card-cat">${p.categoria}</span>
+        <h3 class="card-name">${p.nombre}</h3>
+        <span class="card-price">S/ ${p.precio}</span>
+      </div>
+
+      <div class="card-footer">
+        <span class="stock-indicator">
+          Stock: ${p.stock}
+        </span>
+
+        <button class="buy-btn" ${p.stock === 0 ? "disabled" : ""}>
+          Comprar
+        </button>
+      </div>
+    `;
+
+    // CLICK CARD (DETALLE)
+    card.addEventListener("click", () => showDetail(p));
+
+    // COMPRA
+    card.querySelector(".buy-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      comprar(p.id);
+    });
+
+    grid.appendChild(card);
+  });
+
+  stats();
+}
+
+// ================= DETALLE =================
+function showDetail(p) {
+  detailPanel.classList.add("open");
+
+  detailImg.textContent = "🛍️";
+  detailCat.textContent = p.categoria;
+  detailName.textContent = p.nombre;
+  detailDesc.textContent = p.descripcion;
+  detailPrice.textContent = "S/ " + p.precio;
+  detailStockBadge.textContent = "Stock: " + p.stock;
+
+  detailBuyBtn.onclick = () => comprar(p.id);
+}
+
+// cerrar detalle
+detailClose.addEventListener("click", () => {
+  detailPanel.classList.remove("open");
+});
+
+// ================= COMPRA =================
+function comprar(id) {
+  const p = inventario.find(x => x.id === id);
+
+  if (p.stock > 0) {
+    p.stock--;
+    comprasHoy++;
+
+    guardar();
+    aplicarFiltros();
+  }
+}
+
+// ================= FILTROS =================
+function aplicarFiltros() {
+  const texto = searchInput.value.toLowerCase();
+
+  const filtrados = inventario.filter(p => {
     return (
       (categoriaActual === "todos" || p.categoria === categoriaActual) &&
       p.nombre.toLowerCase().includes(texto)
     );
   });
 
-  if (filtrados.length === 0) {
-    emptyState.style.display = "block";
-  } else {
-    emptyState.style.display = "none";
-  }
+  render(filtrados);
+}
 
-  filtrados.forEach(p => {
-    const card = document.createElement("div");
-    card.classList.add("card");
+// ================= CATEGORIAS =================
+function initCategorias() {
+  const cats = ["todos", "hogar", "tecnologia", "deportes"];
 
-    if (p.stock === 0) card.classList.add("agotado");
+  categoryFilters.innerHTML = "";
 
-    card.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p>S/ ${p.precio}</p>
-      <p>Stock: ${p.stock > 0 ? p.stock : "Agotado"}</p>
-      <button ${p.stock === 0 ? "disabled" : ""}>
-        ${p.stock === 0 ? "Agotado" : "Comprar"}
-      </button>
-    `;
+  cats.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "cat-btn";
+    btn.textContent = cat;
 
-    // CLICK DETALLE
-    card.addEventListener("click", (e) => {
-      if (e.target.tagName !== "BUTTON") {
-        mostrarDetalle(p);
-      }
-    });
+    btn.onclick = () => {
+      document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-    // COMPRA
-    const btn = card.querySelector("button");
+      categoriaActual = cat;
+      aplicarFiltros();
+    };
 
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      comprar(p.id);
-    });
-
-    contenedor.appendChild(card);
+    categoryFilters.appendChild(btn);
   });
-
-  actualizarStats();
 }
 
-// =========================
-// 🛒 COMPRA
-// =========================
+// ================= SEARCH =================
+searchInput.addEventListener("input", aplicarFiltros);
 
-function comprar(id) {
-  const p = inventario.find(x => x.id === id);
+// ================= STATS =================
+function stats() {
+  statTotal.textContent = inventario.length;
 
-  if (p.stock > 0) {
-    p.stock--;
-    guardar();
-    render();
-  }
+  const totalValue = inventario.reduce((a, p) => a + p.precio * p.stock, 0);
+  statInventoryValue.textContent = "S/ " + totalValue.toFixed(2);
+
+  const stock = inventario.reduce((a, p) => a + p.stock, 0);
+  statInStock.textContent = stock;
+
+  statPurchases.textContent = comprasHoy;
 }
 
-// =========================
-// 👁 DETALLE
-// =========================
-
-function mostrarDetalle(p) {
-  detallePanel.classList.add("active");
-
-  detailName.textContent = p.nombre;
-  detailCat.textContent = p.categoria;
-  detailPrice.textContent = "S/ " + p.precio;
-  detailDesc.textContent = p.descripcion;
-  detailStock.textContent = "Stock: " + p.stock;
-  detailImg.textContent = "🌿";
-}
-
-// cerrar panel
-detailClose.addEventListener("click", () => {
-  detallePanel.classList.remove("active");
-});
-
-// =========================
-// 📊 ESTADÍSTICAS
-// =========================
-
-function actualizarStats() {
-  totalProductos.textContent = inventario.length;
-
-  let valor = inventario.reduce((acc, p) => acc + p.precio * p.stock, 0);
-  valorInventario.textContent = "S/ " + valor.toFixed(2);
-
-  let stock = inventario.reduce((acc, p) => acc + p.stock, 0);
-  stockTotal.textContent = stock;
-}
-
-// =========================
-// 🔎 BUSCADOR
-// =========================
-
-buscador.addEventListener("input", render);
-
-// =========================
-// 🧩 FILTROS
-// =========================
-
-botonesFiltro.forEach(btn => {
-  btn.addEventListener("click", () => {
-    botonesFiltro.forEach(b => b.classList.remove("active"));
-
-    btn.classList.add("active");
-
-    categoriaActual = btn.dataset.categoria;
-    render();
-  });
-});
-
-// =========================
-// 🚀 INICIO
-// =========================
-
-render();
+// ================= INIT =================
+initCategorias();
+render(inventario);
