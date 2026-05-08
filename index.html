@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoShop - Catálogo Interactivo</title>
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header>
+        <h1>EcoShop 🌱</h1>
+        <p>Dashboard de Gestión de Productos</p>
+    </header>
+
+    <!-- PANEL DE ESTADÍSTICAS -->
+    <section id="estadisticas">
+        <h2>Estadísticas del Inventario</h2>
+        <p>Total de productos: <span id="total-productos">0</span></p>
+        <p>Valor total del inventario: <span id="valor-inventario">0</span></p>
+    </section>
+
+    <!-- BÚSQUEDA -->
+    <section id="buscador">
+        <h2>Buscar productos</h2>
+        <input 
+            type="text" 
+            id="input-busqueda" 
+            placeholder="Buscar productos por nombre..."
+        >
+    </section>
+
+    <!-- FILTROS -->
+    <section id="filtros">
+        <h2>Categorías</h2>
+        <button data-categoria="todos">Todos</button>
+        <button data-categoria="hogar">Hogar</button>
+        <button data-categoria="tecnología">Tecnología</button>
+        <button data-categoria="deportes">Deportes</button>
+    </section>
+
+    <!-- CONTENEDOR DE PRODUCTOS -->
+    <main>
+        <h2>Productos</h2>
+
+        <section id="grid-productos">
+            <!-- Aquí se renderizan las tarjetas de productos dinámicamente -->
+
+            <!-- EJEMPLO DE CARD (referencial, se generará con JS) -->
+            <article class="card-producto" data-id="0">
+                <img src="" alt="Imagen del producto">
+                
+                <div class="info-producto">
+                    <h3 class="nombre-producto">Nombre</h3>
+                    <p class="categoria-producto">Categoría</p>
+                    <p class="precio-producto">Precio</p>
+                    <p class="stock-producto">Stock: 0</p>
+                </div>
+
+                <div class="acciones-producto">
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <!-- PANEL DE INFORMACIÓN DETALLADA -->
+    <aside id="detalle-producto">
+        <h2>Detalle del Producto</h2>
+        <p>Selecciona un producto para ver más información</p>
+        
+        <div id="contenido-detalle">
+            <!-- Se actualiza dinámicamente al seleccionar un producto -->
+        </div>
+    </aside>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>EcoShop © 2026 - Proyecto Educativo</p>
+    </footer>
+
+</body>
+</html>
