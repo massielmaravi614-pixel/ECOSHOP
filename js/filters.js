@@ -13,4 +13,10 @@ function aplicarFiltros() {
   });
 
   render(filtrados);
-} 
+}
+
+searchInput.addEventListener('input', aplicarFiltros);
+clearSearch.addEventListener('click', () => {
+  searchInput.value = '';
+  aplicarFiltros();
+}); 

@@ -8,4 +8,7 @@ function stats() {
 
   statInventoryValue.textContent =
     "S/ " + totalValue.toFixed(2);
+
+  statInStock.textContent = inventario.reduce((a, p) => a + p.stock, 0);
+  statPurchases.textContent = comprasHoy;
 }

@@ -30,3 +30,7 @@ function addToCart(id) {
 
   return false;
 }
+
+function updateCartCount() {
+  cartCount.textContent = carrito.length;
+}
