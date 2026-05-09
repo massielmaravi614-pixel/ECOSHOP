@@ -1,3 +1,4 @@
+// ================= DATOS =================
 let inventario = JSON.parse(localStorage.getItem("inventarioEco")) || [
   { id: 1, nombre: "Botella Ecológica", precio: 25.5, categoria: "hogar", stock: 10, imagen: "https://picsum.photos/300?1", descripcion: "Botella reutilizable de acero inoxidable." },
   { id: 2, nombre: "Audífonos Bluetooth", precio: 120, categoria: "tecnologia", stock: 8, imagen: "https://picsum.photos/300?2", descripcion: "Audífonos inalámbricos con cancelación de ruido." },
@@ -13,12 +14,17 @@ let inventario = JSON.parse(localStorage.getItem("inventarioEco")) || [
   { id: 12, nombre: "Bicicleta MTB", precio: 1200, categoria: "deportes", stock: 2, imagen: "https://picsum.photos/300?12", descripcion: "Bicicleta de montaña profesional." }
 ];
 
+let carrito = JSON.parse(localStorage.getItem("carritoEco")) || [];
+let comprasHoy = JSON.parse(localStorage.getItem("comprasHoyEco")) || 0;
+let currentTheme = localStorage.getItem("themeEco") || "light";
+
 // ================= DOM =================
 const grid = document.getElementById("productGrid");
 const searchInput = document.getElementById("searchInput");
 const categoryFilters = document.getElementById("categoryFilters");
 const emptyState = document.getElementById("emptyState");
 const resultsCount = document.getElementById("resultsCount");
+const clearSearch = document.getElementById("clearSearch");
 
 // STATS
 const statTotal = document.getElementById("statTotal");
@@ -37,12 +43,101 @@ const detailPrice = document.getElementById("detailPrice");
 const detailStockBadge = document.getElementById("detailStockBadge");
 const detailBuyBtn = document.getElementById("detailBuyBtn");
 
-let categoriaActual = "todos";
-let comprasHoy = 0;
+// THEME & CART
+const themeBtn = document.getElementById("themeBtn");
+const themeIcon = document.getElementById("themeIcon");
+const cartIndicator = document.getElementById("cartIndicator");
+const cartCount = document.getElementById("cartCount");
+const toast = document.getElementById("toast");
 
-// ================= GUARDAR =================
+let categoriaActual = "todos";
+
+// ================= GUARDAR & STORAGE =================
 function guardar() {
   localStorage.setItem("inventarioEco", JSON.stringify(inventario));
+  localStorage.setItem("carritoEco", JSON.stringify(carrito));
+  localStorage.setItem("comprasHoyEco", JSON.stringify(comprasHoy));
+}
+
+// ================= TEMA (LIGHT/DARK) =================
+function initTheme() {
+  if (!localStorage.getItem("themeEco")) {
+    currentTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", currentTheme);
+  themeIcon.textContent = currentTheme === "light" ? "🌙" : "☀️";
+  localStorage.setItem("themeEco", currentTheme);
+}
+
+function toggleTheme() {
+  currentTheme = currentTheme === "light" ? "dark" : "light";
+  applyTheme();
+}
+
+themeBtn.addEventListener("click", toggleTheme);
+
+// ================= NOTIFICACIONES =================
+function showToast(message, type = "success") {
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  toast.style.display = "block";
+  
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+// ================= CARRITO =================
+function updateCartCount() {
+  cartCount.textContent = carrito.length;
+}
+
+function addToCart(id) {
+  const producto = inventario.find(p => p.id === id);
+  if (producto && producto.stock > 0) {
+    carrito.push({ ...producto, cartItemId: Date.now() });
+    producto.stock--;
+    comprasHoy++;
+    guardar();
+    updateCartCount();
+    showToast(`✓ ${producto.nombre} agregado al carrito`, "success");
+    return true;
+  }
+  return false;
+}
+
+function removeFromCart(cartItemId) {
+  const index = carrito.findIndex(item => item.cartItemId === cartItemId);
+  if (index > -1) {
+    const producto = carrito[index];
+    carrito.splice(index, 1);
+    
+    // Devolver el stock al inventario
+    const inventarioItem = inventario.find(p => p.id === producto.id);
+    if (inventarioItem) {
+      inventarioItem.stock++;
+    }
+    
+    guardar();
+    updateCartCount();
+    aplicarFiltros();
+    showToast(`✓ ${producto.nombre} removido del carrito`, "success");
+  }
+}
+
+function viewCart() {
+  if (carrito.length === 0) {
+    showToast("Tu carrito está vacío", "success");
+    return;
+  }
+  
+  let total = carrito.reduce((sum, item) => sum + item.precio, 0);
+  let mensaje = `📦 ${carrito.length} item${carrito.length !== 1 ? 's' : ''} | Total: S/ ${total.toFixed(2)}`;
+  showToast(mensaje, "success");
 }
 
 // ================= RENDER =================
@@ -51,11 +146,11 @@ function render(lista) {
 
   if (lista.length === 0) {
     emptyState.style.display = "block";
+    resultsCount.textContent = "0 productos encontrados";
   } else {
     emptyState.style.display = "none";
+    resultsCount.textContent = `${lista.length} producto${lista.length !== 1 ? "s" : ""} encontrado${lista.length !== 1 ? "s" : ""}`;
   }
-
-  resultsCount.textContent = `${lista.length} productos encontrados`;
 
   lista.forEach(p => {
     const card = document.createElement("div");
@@ -63,22 +158,21 @@ function render(lista) {
 
     if (p.stock === 0) card.classList.add("sold-out");
 
+    const stockText = p.stock === 0 ? "Agotado" : `Stock: ${p.stock}`;
+
     card.innerHTML = `
       <div class="card-img-wrap">
-        <img src="${p.imagen}" width="100%" height="150" style="object-fit:cover;">
+        <img src="${p.imagen}" width="100%" height="150" alt="${p.nombre}" style="object-fit:cover;">
       </div>
 
       <div class="card-body">
         <span class="card-cat">${p.categoria}</span>
         <h3 class="card-name">${p.nombre}</h3>
-        <span class="card-price">S/ ${p.precio}</span>
+        <span class="card-price">S/ ${p.precio.toFixed(2)}</span>
       </div>
 
       <div class="card-footer">
-        <span class="stock-indicator">
-          Stock: ${p.stock}
-        </span>
-
+        <span class="stock-indicator">${stockText}</span>
         <button class="buy-btn" ${p.stock === 0 ? "disabled" : ""}>
           Comprar
         </button>
@@ -86,12 +180,16 @@ function render(lista) {
     `;
 
     // CLICK CARD (DETALLE)
-    card.addEventListener("click", () => showDetail(p));
+    card.addEventListener("click", () => showDetail(p.id));
 
     // COMPRA
     card.querySelector(".buy-btn").addEventListener("click", (e) => {
       e.stopPropagation();
-      comprar(p.id);
+      const comprado = addToCart(p.id);
+      if (comprado) {
+        render(lista);
+        stats();
+      }
     });
 
     grid.appendChild(card);
@@ -101,17 +199,30 @@ function render(lista) {
 }
 
 // ================= DETALLE =================
-function showDetail(p) {
+function showDetail(id) {
+  // Buscar el producto actualizado del inventario
+  const p = inventario.find(prod => prod.id === id);
+  if (!p) return;
+  
   detailPanel.classList.add("open");
 
   detailImg.textContent = "🛍️";
-  detailCat.textContent = p.categoria;
+  detailCat.textContent = p.categoria.toUpperCase();
   detailName.textContent = p.nombre;
   detailDesc.textContent = p.descripcion;
-  detailPrice.textContent = "S/ " + p.precio;
-  detailStockBadge.textContent = "Stock: " + p.stock;
+  detailPrice.textContent = "S/ " + p.precio.toFixed(2);
+  detailStockBadge.textContent = p.stock === 0 ? "Agotado" : "Stock: " + p.stock;
 
-  detailBuyBtn.onclick = () => comprar(p.id);
+  detailBuyBtn.disabled = p.stock === 0;
+  detailBuyBtn.onclick = () => {
+    const comprado = addToCart(p.id);
+    if (comprado) {
+      showToast(`✓ ${p.nombre} agregado! Carrito actualizado`, "success");
+      setTimeout(() => {
+        detailPanel.classList.remove("open");
+      }, 600);
+    }
+  };
 }
 
 // cerrar detalle
@@ -119,28 +230,21 @@ detailClose.addEventListener("click", () => {
   detailPanel.classList.remove("open");
 });
 
-// ================= COMPRA =================
-function comprar(id) {
-  const p = inventario.find(x => x.id === id);
-
-  if (p.stock > 0) {
-    p.stock--;
-    comprasHoy++;
-
-    guardar();
-    aplicarFiltros();
+// Cerrar detail panel con ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    detailPanel.classList.remove("open");
   }
-}
+});
 
 // ================= FILTROS =================
 function aplicarFiltros() {
-  const texto = searchInput.value.toLowerCase();
+  const texto = searchInput.value.toLowerCase().trim();
 
   const filtrados = inventario.filter(p => {
-    return (
-      (categoriaActual === "todos" || p.categoria === categoriaActual) &&
-      p.nombre.toLowerCase().includes(texto)
-    );
+    const matchCategoria = categoriaActual === "todos" || p.categoria === categoriaActual;
+    const matchBusqueda = p.nombre.toLowerCase().includes(texto) || p.descripcion.toLowerCase().includes(texto);
+    return matchCategoria && matchBusqueda;
   });
 
   render(filtrados);
@@ -152,18 +256,20 @@ function initCategorias() {
 
   categoryFilters.innerHTML = "";
 
-  cats.forEach(cat => {
+  cats.forEach((cat, index) => {
     const btn = document.createElement("button");
     btn.className = "cat-btn";
+    if (index === 0) btn.classList.add("active");
     btn.textContent = cat;
 
-    btn.onclick = () => {
+    btn.addEventListener("click", () => {
       document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
       categoriaActual = cat;
+      searchInput.value = "";
       aplicarFiltros();
-    };
+    });
 
     categoryFilters.appendChild(btn);
   });
@@ -172,11 +278,27 @@ function initCategorias() {
 // ================= SEARCH =================
 searchInput.addEventListener("input", aplicarFiltros);
 
+searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    searchInput.value = "";
+    aplicarFiltros();
+  }
+});
+
+clearSearch.addEventListener("click", () => {
+  searchInput.value = "";
+  aplicarFiltros();
+  searchInput.focus();
+});
+
+// ================= CART CLICK =================
+cartIndicator.addEventListener("click", viewCart);
+
 // ================= STATS =================
 function stats() {
   statTotal.textContent = inventario.length;
 
-  const totalValue = inventario.reduce((a, p) => a + p.precio * p.stock, 0);
+  const totalValue = inventario.reduce((a, p) => a + (p.precio * p.stock), 0);
   statInventoryValue.textContent = "S/ " + totalValue.toFixed(2);
 
   const stock = inventario.reduce((a, p) => a + p.stock, 0);
@@ -186,5 +308,7 @@ function stats() {
 }
 
 // ================= INIT =================
+initTheme();
 initCategorias();
+updateCartCount();
 render(inventario);
